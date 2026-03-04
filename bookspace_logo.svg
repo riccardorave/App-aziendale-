@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1f35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d0f1a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5b7cfa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7b9dff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c4b5fd;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="1024" height="1024" rx="220" ry="220" fill="url(#bgGrad)"/>
+
+  <!-- Subtle background glow -->
+  <circle cx="512" cy="480" r="320" fill="#5b7cfa" opacity="0.06"/>
+
+  <!-- Building shape - main body -->
+  <rect x="280" y="340" width="320" height="380" rx="8" fill="url(#buildingGrad)" filter="url(#glow)"/>
+
+  <!-- Building top/roof accent -->
+  <rect x="300" y="320" width="280" height="30" rx="6" fill="url(#accentGrad)" opacity="0.9"/>
+
+  <!-- Windows grid - left column -->
+  <rect x="310" y="380" width="55" height="45" rx="6" fill="white" opacity="0.15"/>
+  <rect x="310" y="445" width="55" height="45" rx="6" fill="white" opacity="0.25"/>
+  <rect x="310" y="510" width="55" height="45" rx="6" fill="white" opacity="0.15"/>
+  <rect x="310" y="575" width="55" height="45" rx="6" fill="white" opacity="0.2"/>
+
+  <!-- Windows grid - middle column -->
+  <rect x="382" y="380" width="55" height="45" rx="6" fill="white" opacity="0.25"/>
+  <rect x="382" y="445" width="55" height="45" rx="6" fill="white" opacity="0.15"/>
+  <rect x="382" y="510" width="55" height="45" rx="6" fill="white" opacity="0.3"/>
+  <rect x="382" y="575" width="55" height="45" rx="6" fill="white" opacity="0.15"/>
+
+  <!-- Windows grid - right column -->
+  <rect x="454" y="380" width="55" height="45" rx="6" fill="white" opacity="0.2"/>
+  <rect x="454" y="445" width="55" height="45" rx="6" fill="white" opacity="0.3"/>
+  <rect x="454" y="510" width="55" height="45" rx="6" fill="white" opacity="0.15"/>
+  <rect x="454" y="575" width="55" height="45" rx="6" fill="white" opacity="0.25"/>
+
+  <!-- Door -->
+  <rect x="382" y="640" width="75" height="80" rx="6" fill="white" opacity="0.12"/>
+
+  <!-- Small building right - secondary -->
+  <rect x="630" y="430" width="120" height="290" rx="6" fill="#a78bfa" opacity="0.3"/>
+  <rect x="645" y="465" width="30" height="28" rx="4" fill="white" opacity="0.2"/>
+  <rect x="690" y="465" width="30" height="28" rx="4" fill="white" opacity="0.15"/>
+  <rect x="645" y="510" width="30" height="28" rx="4" fill="white" opacity="0.15"/>
+  <rect x="690" y="510" width="30" height="28" rx="4" fill="white" opacity="0.2"/>
+  <rect x="645" y="555" width="30" height="28" rx="4" fill="white" opacity="0.2"/>
+  <rect x="690" y="555" width="30" height="28" rx="4" fill="white" opacity="0.15"/>
+
+  <!-- Calendar badge - top right -->
+  <rect x="580" y="250" width="160" height="160" rx="28" fill="#1c2240" stroke="url(#accentGrad)" stroke-width="3"/>
+  <rect x="580" y="250" width="160" height="48" rx="14" fill="url(#buildingGrad)"/>
+  <rect x="580" y="278" width="160" height="22" fill="url(#buildingGrad)"/>
+
+  <!-- Calendar lines -->
+  <line x1="600" y1="325" x2="720" y2="325" stroke="white" stroke-width="2" opacity="0.15"/>
+  <line x1="600" y1="350" x2="720" y2="350" stroke="white" stroke-width="2" opacity="0.15"/>
+  <line x1="600" y1="375" x2="720" y2="375" stroke="white" stroke-width="2" opacity="0.15"/>
+
+  <!-- Calendar dots -->
+  <circle cx="618" cy="338" r="5" fill="white" opacity="0.6"/>
+  <circle cx="648" cy="338" r="5" fill="white" opacity="0.3"/>
+  <circle cx="678" cy="338" r="5" fill="#a78bfa" opacity="0.9"/>
+  <circle cx="708" cy="338" r="5" fill="white" opacity="0.3"/>
+
+  <circle cx="618" cy="363" r="5" fill="white" opacity="0.3"/>
+  <circle cx="648" cy="363" r="5" fill="#5b7cfa" opacity="0.9"/>
+  <circle cx="678" cy="363" r="5" fill="white" opacity="0.3"/>
+  <circle cx="708" cy="363" r="5" fill="white" opacity="0.6"/>
+
+  <!-- Calendar hooks -->
+  <rect x="618" y="244" width="8" height="24" rx="4" fill="url(#accentGrad)"/>
+  <rect x="694" y="244" width="8" height="24" rx="4" fill="url(#accentGrad)"/>
+
+  <!-- Check mark accent - bottom right of calendar -->
+  <circle cx="722" cy="392" r="22" fill="#34d399" opacity="0.9" filter="url(#glow)"/>
+  <polyline points="711,392 719,400 733,383" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Ground line -->
+  <rect x="200" y="718" width="480" height="4" rx="2" fill="url(#buildingGrad)" opacity="0.4"/>
+  <rect x="240" y="722" width="400" height="2" rx="1" fill="url(#buildingGrad)" opacity="0.15"/>
+</svg>

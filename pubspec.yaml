@@ -1,0 +1,48 @@
+name: booking_interno
+description: App di booking interno aziendale — sale riunioni, desk, attrezzature.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP client con interceptor per JWT
+  dio: ^5.4.3+1
+
+  # Secure storage per il token JWT
+  flutter_secure_storage: ^9.2.2
+
+  # State management
+  provider: ^6.1.2
+
+  # Calendario
+  table_calendar: ^3.1.2
+
+  # Navigazione
+  go_router: ^13.2.0
+
+  # UI helpers
+  intl: ^0.19.0
+  cached_network_image: ^3.3.1
+
+  # Icone extra
+  cupertino_icons: ^1.0.6
+  flutter_launcher_icons: ^0.14.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  # assets:
+  #   - assets/images/
+  # fonts:
+  #   - family: Syne
+  #     fonts:
+  #       - asset: assets/fonts/Syne-Regular.ttf

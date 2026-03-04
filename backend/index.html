@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookSpace — Prenotazioni Interne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@400;500;600;700;800&display=swap">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #151820;
+  --surface-2: #1c2030;
+  --surface-3: #232840;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+  --text: #e8eaf0;
+  --text-muted: #7b82a0;
+  --text-dim: #4a5070;
+  --accent: #5b7cfa;
+  --accent-glow: rgba(91,124,250,0.25);
+  --accent-2: #a78bfa;
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,0.15);
+  --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.15);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.15);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96,165,250,0.15);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
+
+/* ── AUTH ── */
+#auth-screen {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(91,124,250,0.18) 0%, transparent 70%), var(--bg);
+}
+.auth-card {
+  width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.4s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.auth-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.auth-logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.auth-logo-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+.auth-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+.auth-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
+.auth-tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 10px; margin-bottom: 28px; }
+.auth-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-muted); transition: all 0.2s; }
+.auth-tab.active { background: var(--surface-3); color: var(--text); }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+.field input, .field select {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field input::placeholder { color: var(--text-dim); }
+.field select option { background: var(--surface-2); }
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #7b9dff);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.password-hints { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+.pw-hint { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--surface-3); color: var(--text-dim); transition: all 0.2s; }
+.pw-hint.ok { background: var(--green-dim); color: var(--green); }
+
+.error-msg { background: var(--red-dim); border: 1px solid rgba(248,113,113,0.3); color: var(--red); padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+
+/* ── APP LAYOUT ── */
+#app { display: none; min-height: 100vh; }
+
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 24px 16px;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px; margin-bottom: 32px; }
+.sidebar-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.sidebar-logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+
+.nav { flex: 1; }
+.nav-section { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); padding: 0 8px; margin-bottom: 8px; margin-top: 20px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text-muted); transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--surface-2); color: var(--text); }
+.nav-item.active { background: var(--accent-glow); color: var(--accent); }
+.nav-item .icon { width: 20px; text-align: center; font-size: 16px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; }
+
+.sidebar-footer { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+.user-card { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--radius-sm); cursor: pointer; }
+.user-card:hover { background: var(--surface-2); }
+.avatar { width: 34px; height: 34px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--text-muted); }
+.logout-btn { font-size: 18px; color: var(--text-dim); cursor: pointer; padding: 4px; line-height: 1; transition: color 0.15s; }
+.logout-btn:hover { color: var(--red); }
+
+/* ── MAIN ── */
+.main { margin-left: 260px; padding: 32px; min-height: 100vh; }
+
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
+.page-sub { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: #4a6ee0; }
+.btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-3); border-color: var(--border-hover); }
+.btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+.btn-danger:hover { background: rgba(248,113,113,0.25); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+/* ── DASHBOARD ── */
+.dashboard-header-meta { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.stat-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.stat-card.blue::before { background: var(--accent); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.amber::before { background: var(--amber); }
+.stat-card.purple::before { background: var(--accent-2); }
+.stat-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+.stat-card.blue .stat-icon { background: var(--blue-dim); }
+.stat-card.green .stat-icon { background: var(--green-dim); }
+.stat-card.amber .stat-icon { background: var(--amber-dim); }
+.stat-card.purple .stat-icon { background: rgba(167,139,250,0.15); }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── FILTERS ── */
+.filters-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 99px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--text-muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-chip:hover, .filter-chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+.search-input {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 9px 14px 9px 38px;
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  outline: none; width: 240px; transition: border-color 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237b82a0' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 12px center;
+}
+.search-input:focus { border-color: var(--accent); }
+
+/* ── RESOURCES ── */
+.resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.resource-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.resource-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.resource-type-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 4px 10px; border-radius: 99px; margin-bottom: 14px;
+}
+.type-meeting_room { background: var(--blue-dim); color: var(--blue); }
+.type-desk { background: var(--green-dim); color: var(--green); }
+.type-equipment { background: var(--amber-dim); color: var(--amber); }
+.resource-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.resource-location { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+.resource-capacity { font-size: 13px; color: var(--text-muted); }
+.amenities { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.amenity { background: var(--surface-2); border: 1px solid var(--border); padding: 3px 8px; border-radius: 4px; font-size: 11px; color: var(--text-muted); }
+.resource-footer { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.availability-dot { width: 8px; height: 8px; border-radius: 99px; background: var(--green); display: inline-block; margin-right: 6px; }
+.availability-dot.busy { background: var(--red); }
+.availability-text { font-size: 12px; color: var(--text-muted); }
+
+/* ── BOOKINGS ── */
+.bookings-list { display: flex; flex-direction: column; gap: 12px; }
+.booking-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: auto 1px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  transition: border-color 0.15s;
+}
+.booking-item:hover { border-color: var(--border-hover); }
+.booking-time-block { text-align: center; min-width: 56px; }
+.booking-time-day { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+.booking-time-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+.booking-time-month { font-size: 11px; color: var(--text-muted); }
+.booking-divider { width: 1px; height: 48px; background: var(--border); }
+.booking-info { min-width: 0; }
+.booking-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 8px; }
+.booking-meta { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.booking-actions { display: flex; gap: 8px; align-items: center; }
+.recurring-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: rgba(167,139,250,0.15); color: var(--accent-2); }
+
+.status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.status-confirmed { background: var(--green-dim); color: var(--green); }
+.status-cancelled { background: var(--red-dim); color: var(--red); }
+.status-past { background: var(--surface-3); color: var(--text-muted); }
+
+/* ── CALENDAR ── */
+.calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.calendar-nav { display: flex; align-items: center; gap: 12px; }
+.calendar-nav-btn { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--text); font-size: 14px; transition: all 0.15s; }
+.calendar-nav-btn:hover { background: var(--surface-3); }
+.calendar-month { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; min-width: 180px; text-align: center; }
+.calendar-grid { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.calendar-days-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--border); }
+.calendar-day-name { padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.calendar-cells { display: grid; grid-template-columns: repeat(7, 1fr); }
+.calendar-cell {
+  min-height: 96px; padding: 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+}
+.calendar-cell:nth-child(7n) { border-right: none; }
+.calendar-cell:hover { background: var(--surface-2); }
+.calendar-cell.other-month .cell-date { color: var(--text-dim); }
+.calendar-cell.today .cell-date { background: var(--accent); color: #fff; }
+.cell-date { width: 28px; height: 28px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.cell-event { padding: 2px 6px; border-radius: 0 4px 4px 0; font-size: 10px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.cell-event.type-meeting_room { background: var(--blue-dim); border-left: 2px solid var(--blue); color: var(--blue); }
+.cell-event.type-desk { background: var(--green-dim); border-left: 2px solid var(--green); color: var(--green); }
+.cell-event.type-equipment { background: var(--amber-dim); border-left: 2px solid var(--amber); color: var(--amber); }
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  width: 500px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.25s ease;
+}
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+.modal-close { background: var(--surface-2); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; color: var(--text-muted); font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.modal-close:hover { background: var(--surface-3); color: var(--text); }
+.modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── TOAST ── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+  font-size: 14px; min-width: 280px;
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.toast.success { border-color: rgba(52,211,153,0.3); }
+.toast.error { border-color: rgba(248,113,113,0.3); }
+.toast-icon { font-size: 18px; }
+.toast-text { flex: 1; }
+
+/* ── EMPTY ── */
+.empty-state { text-align: center; padding: 64px 32px; color: var(--text-muted); }
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.empty-sub { font-size: 14px; }
+
+/* ── ADMIN TABLE ── */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--surface-2); padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+td { padding: 14px 16px; font-size: 14px; border-top: 1px solid var(--border); }
+tr:hover td { background: var(--surface-2); }
+
+/* ── LOADING ── */
+.spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay { display: flex; align-items: center; justify-content: center; padding: 48px; }
+
+/* ── SECTION TITLE ── */
+.section-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; padding: 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">📅</div>
+      <span class="auth-logo-text">BookSpace</span>
+    </div>
+    <h1 class="auth-title">bentornato</h1>
+    <p class="auth-sub">Accedi per gestire le tue prenotazioni</p>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Accedi</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Registrati</div>
+    </div>
+
+    <div id="auth-error" class="error-msg"></div>
+
+    <!-- FORGOT -->
+    <div id="forgot-form" style="display:none">
+      <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">Inserisci la tua email e ti manderemo un link per reimpostare la password.</p>
+      <div class="field"><label>Email</label><input type="email" id="forgot-email" placeholder="nome@azienda.com"></div>
+      <button class="btn-primary" onclick="handleForgotPassword()" id="forgot-btn">Invia link di reset</button>
+      <p style="text-align:center;margin-top:12px;">
+        <a href="#" onclick="event.preventDefault();$('forgot-form').style.display='none';$('login-form').style.display='block';$('auth-error').style.display='none';" style="color:var(--accent);font-size:13px;text-decoration:none;">← Torna al login</a>
+      </p>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-form">
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="nome@azienda.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="handleLogin()" id="login-btn">Accedi</button>
+      <p style="text-align:center;margin-top:12px;">
+        <a href="#" onclick="event.preventDefault();showForgotPassword()" style="color:var(--accent);font-size:13px;text-decoration:none;">Password dimenticata?</a>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register-form" style="display:none">
+      <div class="field"><label>Nome completo</label><input type="text" id="reg-name" placeholder="Mario Rossi"></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="nome@azienda.com"></div>
+      <div class="field"><label>Dipartimento</label>
+        <select id="reg-dept">
+          <option value="">Seleziona...</option>
+          <option>Sviluppo</option><option>Marketing</option>
+          <option>Commerciale</option><option>Amministrazione</option>
+          <option>HR</option><option>IT</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min 8 car., 1 maiuscola, 1 numero, 1 simbolo" oninput="checkPasswordHints('reg-password','reg-hints')">
+        <div class="password-hints" id="reg-hints">
+          <span class="pw-hint" id="reg-h1">8+ caratteri</span>
+          <span class="pw-hint" id="reg-h2">Maiuscola</span>
+          <span class="pw-hint" id="reg-h3">Numero</span>
+          <span class="pw-hint" id="reg-h4">Simbolo</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="handleRegister()" id="reg-btn">Crea account</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">📅</div>
+      <span class="sidebar-logo-text">BookSpace</span>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principale</div>
+      <div class="nav-item active" onclick="showView('dashboard')">
+        <span class="icon">▦</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showView('resources')">
+        <span class="icon">🏢</span> Risorse
+      </div>
+      <div class="nav-item" onclick="showView('bookings')">
+        <span class="icon">📋</span> Le mie prenotazioni
+      </div>
+      <div class="nav-item" onclick="showView('calendar')">
+        <span class="icon">📆</span> Calendario
+      </div>
+      <div class="nav-item" onclick="showView('profile')">
+        <span class="icon">👤</span> Profilo
+      </div>
+      <div id="admin-nav" style="display:none">
+        <div class="nav-section">Amministrazione</div>
+        <div class="nav-item" onclick="showView('admin-bookings')">
+          <span class="icon">📊</span> Tutte le prenotazioni
+        </div>
+        <div class="nav-item" onclick="showView('admin-resources')">
+          <span class="icon">⚙️</span> Gestisci risorse
+        </div>
+        <div class="nav-item" onclick="showView('admin-users')">
+          <span class="icon">👥</span> Utenti
+        </div>
+        <div class="nav-item" onclick="showView('admin-logs')">
+          <span class="icon">📜</span> Log attività
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar" id="sidebar-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">...</div>
+          <div class="user-role" id="sidebar-role">...</div>
+        </div>
+        <span class="logout-btn" onclick="logout()" title="Esci">↪</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" id="dashboard-greeting">Buongiorno!</h1>
+          <p class="dashboard-header-meta" id="dashboard-date"></p>
+        </div>
+        <button class="btn btn-accent" onclick="openNewBookingModal()">＋ Nuova prenotazione</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="stat-today">—</div>
+          <div class="stat-label">Prenotazioni oggi</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🔜</div>
+          <div class="stat-value" id="stat-upcoming">—</div>
+          <div class="stat-label">Prossime prenotazioni</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">🏢</div>
+          <div class="stat-value" id="stat-rooms">—</div>
+          <div class="stat-label">Sale disponibili</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">💻</div>
+          <div class="stat-value" id="stat-equipment">—</div>
+          <div class="stat-label">Attrezzature disponibili</div>
+        </div>
+      </div>
+      <div class="section-title">📌 Le tue prossime prenotazioni</div>
+      <div id="dashboard-bookings" class="bookings-list"></div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="view" id="view-resources">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Risorse</h1>
+          <p class="page-sub">Cerca e prenota una risorsa disponibile</p>
+        </div>
+      </div>
+      <div class="filters-bar">
+        <input class="search-input" type="text" id="resource-search" placeholder="Cerca risorsa..." oninput="filterResources()">
+        <div class="filter-chip active" onclick="setTypeFilter('all', this)">Tutte</div>
+        <div class="filter-chip" onclick="setTypeFilter('meeting_room', this)">🏢 Sale</div>
+        <div class="filter-chip" onclick="setTypeFilter('desk', this)">💼 Desk</div>
+        <div class="filter-chip" onclick="setTypeFilter('equipment', this)">🎯 Attrezzature</div>
+      </div>
+      <div id="resources-grid" class="resources-grid"></div>
+    </div>
+
+    <!-- MY BOOKINGS -->
+    <div class="view" id="view-bookings">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Le mie prenotazioni</h1>
+          <p class="page-sub">Storico e prenotazioni future</p>
+        </div>
+        <button class="btn btn-accent" onclick="openNewBookingModal()">＋ Nuova</button>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-chip active" onclick="setBookingFilter('upcoming', this)">Prossime</div>
+        <div class="filter-chip" onclick="setBookingFilter('all', this)">Tutte</div>
+      </div>
+      <div id="my-bookings-list" class="bookings-list"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="view" id="view-calendar">
+      <div class="page-header">
+        <div><h1 class="page-title">Calendario</h1><p class="page-sub">Visualizza le prenotazioni per mese</p></div>
+      </div>
+      <div class="calendar-header">
+        <div class="calendar-nav">
+          <button class="calendar-nav-btn" onclick="changeMonth(-1)">←</button>
+          <span class="calendar-month" id="calendar-month-label">...</span>
+          <button class="calendar-nav-btn" onclick="changeMonth(1)">→</button>
+        </div>
+        <button class="btn btn-accent btn-sm" onclick="goToToday()">Oggi</button>
+      </div>
+      <div class="calendar-grid">
+        <div class="calendar-days-header">
+          <div class="calendar-day-name">Lun</div>
+          <div class="calendar-day-name">Mar</div>
+          <div class="calendar-day-name">Mer</div>
+          <div class="calendar-day-name">Gio</div>
+          <div class="calendar-day-name">Ven</div>
+          <div class="calendar-day-name">Sab</div>
+          <div class="calendar-day-name">Dom</div>
+        </div>
+        <div class="calendar-cells" id="calendar-cells"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="view" id="view-profile">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Il mio profilo</h1>
+          <p class="page-sub">Gestisci i tuoi dati personali e la sicurezza</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px">
+          <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;margin-bottom:20px">Dati personali</h3>
+          <div id="profile-error" class="error-msg"></div>
+          <div id="profile-success" style="display:none;background:var(--green-dim);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px"></div>
+          <div class="field"><label>Nome completo</label><input type="text" id="profile-name" placeholder="Mario Rossi"></div>
+          <div class="field"><label>Email</label><input type="email" id="profile-email" disabled style="opacity:0.5;cursor:not-allowed"></div>
+          <div class="field"><label>Dipartimento</label>
+            <select id="profile-dept">
+              <option value="">Seleziona...</option>
+              <option>Sviluppo</option><option>Marketing</option>
+              <option>Commerciale</option><option>Amministrazione</option>
+              <option>HR</option><option>IT</option>
+            </select>
+          </div>
+          <button class="btn btn-accent" onclick="saveProfile()" style="width:100%;margin-top:4px">Salva modifiche</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px">
+          <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;margin-bottom:20px">Sicurezza</h3>
+          <div id="password-error" class="error-msg"></div>
+          <div id="password-success" style="display:none;background:var(--green-dim);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px"></div>
+          <div class="field"><label>Password attuale</label><input type="password" id="profile-current-pw" placeholder="••••••••"></div>
+          <div class="field">
+            <label>Nuova password</label>
+            <input type="password" id="profile-new-pw" placeholder="Min 8 car., 1 maiuscola, 1 numero, 1 simbolo" oninput="checkPasswordHints('profile-new-pw','profile-hints')">
+            <div class="password-hints" id="profile-hints">
+              <span class="pw-hint" id="profile-h1">8+ caratteri</span>
+              <span class="pw-hint" id="profile-h2">Maiuscola</span>
+              <span class="pw-hint" id="profile-h3">Numero</span>
+              <span class="pw-hint" id="profile-h4">Simbolo</span>
+            </div>
+          </div>
+          <div class="field"><label>Conferma nuova password</label><input type="password" id="profile-confirm-pw" placeholder="Ripeti la password"></div>
+          <button class="btn btn-accent" onclick="savePassword()" style="width:100%;margin-top:4px">Cambia password</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN BOOKINGS -->
+    <div class="view" id="view-admin-bookings">
+      <div class="page-header">
+        <div><h1 class="page-title">Tutte le prenotazioni</h1><p class="page-sub">Vista amministratore</p></div>
+      </div>
+      <div class="filters-bar">
+        <div class="filter-chip active" onclick="setAdminBookingFilter('upcoming', this)">Prossime</div>
+        <div class="filter-chip" onclick="setAdminBookingFilter('all', this)">Tutte</div>
+        <div class="filter-chip" onclick="setAdminBookingFilter('past', this)">Passate</div>
+      </div>
+      <div class="table-wrap"><div id="admin-bookings-content"></div></div>
+    </div>
+
+    <!-- ADMIN RESOURCES -->
+    <div class="view" id="view-admin-resources">
+      <div class="page-header">
+        <div><h1 class="page-title">Gestisci risorse</h1><p class="page-sub">Aggiungi, modifica o disattiva risorse</p></div>
+        <button class="btn btn-accent" onclick="openAddResourceModal()">＋ Aggiungi risorsa</button>
+      </div>
+      <div class="table-wrap"><div id="admin-resources-content"></div></div>
+    </div>
+
+    <!-- ADMIN USERS -->
+    <div class="view" id="view-admin-users">
+      <div class="page-header">
+        <div><h1 class="page-title">Utenti</h1><p class="page-sub">Gestisci i ruoli degli utenti</p></div>
+      </div>
+      <div class="table-wrap"><div id="admin-users-content"></div></div>
+    </div>
+
+    <!-- ADMIN LOGS -->
+    <div class="view" id="view-admin-logs">
+      <div class="page-header">
+        <div><h1 class="page-title">Log attività</h1><p class="page-sub">Storico di tutte le azioni nel sistema</p></div>
+        <div style="display:flex;gap:8px">
+          <select id="log-filter-action" class="search-input" style="width:180px;padding-left:14px" onchange="loadAdminLogs()">
+            <option value="">Tutte le azioni</option>
+            <option value="BOOKING_CREATED">Prenotazioni create</option>
+            <option value="BOOKING_CANCELLED">Prenotazioni cancellate</option>
+            <option value="USER_ROLE_CHANGED">Ruoli modificati</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadAdminLogs()">🔄 Aggiorna</button>
+        </div>
+      </div>
+      <div class="table-wrap"><div id="admin-logs-content"></div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+
+<!-- NEW BOOKING -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-booking-title">Nuova prenotazione</div>
+        <div style="color:var(--text-muted);font-size:13px;margin-top:4px;" id="modal-resource-name"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-booking')">✕</button>
+    </div>
+    <div id="booking-form-error" class="error-msg"></div>
+    <div class="field"><label>Risorsa</label>
+      <select id="booking-resource-id" onchange="updateResourceLabel()">
+        <option value="">Seleziona una risorsa...</option>
+      </select>
+    </div>
+    <div class="field"><label>Titolo prenotazione</label><input type="text" id="booking-title" placeholder="es. Stand-up settimanale"></div>
+    <div class="field"><label>Data</label><input type="date" id="booking-date"></div>
+    <div class="time-row">
+      <div class="field"><label>Ora inizio</label><input type="time" id="booking-start" value="09:00"></div>
+      <div class="field"><label>Ora fine</label><input type="time" id="booking-end" value="10:00"></div>
+    </div>
+    <div class="field"><label>Note (opzionale)</label><input type="text" id="booking-notes" placeholder="Ulteriori informazioni..."></div>
+    <div class="field">
+      <label>Prenotazione ricorrente</label>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+        <input type="checkbox" id="booking-recurring" onchange="toggleRecurring()" style="width:18px;height:18px;cursor:pointer;accent-color:var(--accent)">
+        <span style="font-size:14px;color:var(--text-muted)">Ripeti ogni settimana</span>
+      </div>
+    </div>
+    <div id="recurring-options" style="display:none">
+      <div class="field">
+        <label>Numero di settimane (max 4)</label>
+        <select id="booking-weeks">
+          <option value="2">2 settimane</option>
+          <option value="3">3 settimane</option>
+          <option value="4">4 settimane</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-booking')">Annulla</button>
+      <button class="btn btn-accent" onclick="submitBooking()" id="booking-submit-btn">Conferma prenotazione</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESOURCE DETAIL -->
+<div class="modal-overlay" id="modal-resource-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detail-resource-name">Dettaglio risorsa</div>
+      <button class="modal-close" onclick="closeModal('modal-resource-detail')">✕</button>
+    </div>
+    <div id="detail-resource-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-resource-detail')">Chiudi</button>
+      <button class="btn btn-accent" id="detail-book-btn">📅 Prenota ora</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD RESOURCE -->
+<div class="modal-overlay" id="modal-add-resource">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Aggiungi risorsa</div>
+      <button class="modal-close" onclick="closeModal('modal-add-resource')">✕</button>
+    </div>
+    <div class="field"><label>Nome</label><input type="text" id="res-name" placeholder="Sala Alfa"></div>
+    <div class="field"><label>Tipo</label>
+      <select id="res-type">
+        <option value="meeting_room">Sala riunioni</option>
+        <option value="desk">Desk / Postazione</option>
+        <option value="equipment">Attrezzatura</option>
+      </select>
+    </div>
+    <div class="field"><label>Ubicazione</label><input type="text" id="res-location" placeholder="Piano 2 - Ala Nord"></div>
+    <div class="field"><label>Capienza (solo sale)</label><input type="number" id="res-capacity" placeholder="10" min="1"></div>
+    <div class="field"><label>Descrizione</label><input type="text" id="res-description" placeholder="Breve descrizione..."></div>
+    <div class="field"><label>Dotazioni (separate da virgola)</label><input type="text" id="res-amenities" placeholder="Proiettore, Lavagna, Clima"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-resource')">Annulla</button>
+      <button class="btn btn-accent" onclick="submitAddResource()">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const API = 'http://localhost:3001/api';
+
+let token = localStorage.getItem('bs_token');
+let currentUser = null;
+let allResources = [];
+let currentTypeFilter = 'all';
+let currentBookingFilter = 'upcoming';
+let currentAdminBookingFilter = 'upcoming';
+let calendarDate = new Date();
+
+const $ = id => document.getElementById(id);
+
+// ── UTILS ──
+async function apiFetch(path, options = {}) {
+  const res = await fetch(API + path, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    ...options,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Errore sconosciuto');
+  return data;
+}
+
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span><span class="toast-text">${msg}</span>`;
+  $('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function formatDate(dt) {
+  return new Date(dt).toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: 'short' });
+}
+function formatTime(dt) {
+  return new Date(dt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+}
+function typeLabel(t) {
+  return { meeting_room: 'Sala riunioni', desk: 'Desk', equipment: 'Attrezzatura' }[t] || t;
+}
+function typeEmoji(t) {
+  return { meeting_room: '🏢', desk: '💼', equipment: '🎯' }[t] || '📦';
+}
+function initials(name) {
+  return (name || '?').split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// ── PASSWORD HINTS ──
+function checkPasswordHints(inputId, hintsPrefix) {
+  const val = $(inputId).value;
+  const toggle = (id, ok) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('ok', ok);
+  };
+  toggle(`${hintsPrefix.replace('-hints','')}-h1`, val.length >= 8);
+  toggle(`${hintsPrefix.replace('-hints','')}-h2`, /[A-Z]/.test(val));
+  toggle(`${hintsPrefix.replace('-hints','')}-h3`, /[0-9]/.test(val));
+  toggle(`${hintsPrefix.replace('-hints','')}-h4`, /[^a-zA-Z0-9]/.test(val));
+}
+
+// ── AUTH ──
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((el, i) => el.classList.toggle('active', (i === 0) === (tab === 'login')));
+  $('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  $('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  $('auth-error').style.display = 'none';
+}
+
+async function handleLogin() {
+  const btn = $('login-btn');
+  btn.disabled = true; btn.textContent = 'Accesso in corso...';
+  try {
+    const res = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: $('login-email').value, password: $('login-password').value }),
+    });
+    token = res.token;
+    localStorage.setItem('bs_token', token);
+    currentUser = res.user;
+    initApp();
+  } catch (e) {
+    const err = $('auth-error');
+    err.textContent = e.message; err.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Accedi';
+  }
+}
+
+async function handleRegister() {
+  const btn = $('reg-btn');
+  const password = $('reg-password').value;
+  // Validate password
+  if (password.length < 8) { showAuthError('La password deve essere di almeno 8 caratteri'); return; }
+  if (!/[A-Z]/.test(password)) { showAuthError('La password deve contenere almeno una lettera maiuscola'); return; }
+  if (!/[0-9]/.test(password)) { showAuthError('La password deve contenere almeno un numero'); return; }
+  if (!/[^a-zA-Z0-9]/.test(password)) { showAuthError('La password deve contenere almeno un simbolo'); return; }
+
+  btn.disabled = true; btn.textContent = 'Registrazione...';
+  try {
+    const pw = $('reg-password').value;
+    const errEl = $('auth-error');
+    if (pw.length < 8) { errEl.textContent = 'La password deve essere di almeno 8 caratteri'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Crea account'; return; }
+    if (!/[A-Z]/.test(pw)) { errEl.textContent = 'La password deve contenere almeno una lettera maiuscola'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Crea account'; return; }
+    if (!/[0-9]/.test(pw)) { errEl.textContent = 'La password deve contenere almeno un numero'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Crea account'; return; }
+    if (!/[^a-zA-Z0-9]/.test(pw)) { errEl.textContent = 'La password deve contenere almeno un simbolo (es. @, ., #, !)'; errEl.style.display = 'block'; btn.disabled = false; btn.textContent = 'Crea account'; return; }
+    const res = await apiFetch('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: $('reg-name').value,
+        email: $('reg-email').value,
+        password,
+        department: $('reg-dept').value,
+      }),
+    });
+    token = res.token;
+    localStorage.setItem('bs_token', token);
+    currentUser = res.user;
+    initApp();
+  } catch (e) {
+    showAuthError(e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crea account';
+  }
+}
+
+function showAuthError(msg) {
+  const err = $('auth-error');
+  err.textContent = msg;
+  err.style.background = 'var(--red-dim)';
+  err.style.color = 'var(--red)';
+  err.style.borderColor = 'rgba(248,113,113,0.3)';
+  err.style.display = 'block';
+}
+
+function logout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('bs_token');
+  $('app').style.display = 'none';
+  $('auth-screen').style.display = 'flex';
+}
+
+// ── INIT ──
+async function initApp() {
+  if (!token) return;
+  try {
+    currentUser = await apiFetch('/auth/me');
+  } catch {
+    logout(); return;
+  }
+
+  $('auth-screen').style.display = 'none';
+  $('app').style.display = 'block';
+
+  const av = $('sidebar-avatar');
+  av.textContent = initials(currentUser.name);
+  av.style.background = currentUser.avatar_color;
+  $('sidebar-name').textContent = currentUser.name;
+  updateSidebarRole();
+
+  if (currentUser.role === 'admin') $('admin-nav').style.display = 'block';
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Buongiorno' : hour < 18 ? 'Buon pomeriggio' : 'Buonasera';
+  $('dashboard-greeting').textContent = `${greeting}, ${currentUser.name.split(' ')[0]}!`;
+
+  const now = new Date();
+  $('dashboard-date').textContent = now.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  $('booking-date').min = now.toISOString().split('T')[0];
+  $('booking-date').value = now.toISOString().split('T')[0];
+
+  await loadResources();
+  loadDashboard();
+  showView('dashboard');
+}
+
+function updateSidebarRole() {
+  $('sidebar-role').textContent = currentUser.role === 'admin' ? '⚡ Amministratore' : currentUser.department || 'Dipendente';
+}
+
+// ── NAVIGATION ──
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  $(`view-${name}`)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(`'${name}'`)) n.classList.add('active');
+  });
+  if (name === 'resources') renderResources();
+  if (name === 'bookings') loadMyBookings();
+  if (name === 'calendar') renderCalendar();
+  if (name === 'admin-bookings') loadAdminBookings();
+  if (name === 'admin-resources') loadAdminResources();
+  if (name === 'admin-users') loadAdminUsers();
+  if (name === 'profile') loadProfileView();
+  if (name === 'admin-logs') loadAdminLogs();
+}
+
+// ── RESOURCES ──
+async function loadResources() {
+  try {
+    allResources = await apiFetch('/resources');
+    populateResourceSelect();
+  } catch (e) { toast('Errore caricamento risorse', 'error'); }
+}
+
+function populateResourceSelect() {
+  const sel = $('booking-resource-id');
+  sel.innerHTML = '<option value="">Seleziona una risorsa...</option>';
+  allResources.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = `${typeEmoji(r.type)} ${r.name} — ${r.location || ''}`;
+    sel.appendChild(opt);
+  });
+}
+
+function renderResources() {
+  const grid = $('resources-grid');
+  const search = $('resource-search').value.toLowerCase();
+  const filtered = allResources.filter(r => {
+    const matchType = currentTypeFilter === 'all' || r.type === currentTypeFilter;
+    const matchSearch = r.name.toLowerCase().includes(search) || (r.location || '').toLowerCase().includes(search);
+    return matchType && matchSearch;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div class="empty-title">Nessuna risorsa trovata</div><div class="empty-sub">Prova a cambiare i filtri</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => {
+    const amenities = Array.isArray(r.amenities) ? r.amenities : (typeof r.amenities === 'string' ? JSON.parse(r.amenities || '[]') : []);
+    const todayBookings = Array.isArray(r.today_bookings) ? r.today_bookings : [];
+    const now = new Date();
+    const busy = todayBookings.some(b => new Date(b.start_time) <= now && new Date(b.end_time) > now);
+    return `
+    <div class="resource-card" onclick="openResourceDetail('${r.id}')">
+      <div class="resource-type-badge type-${r.type}">${typeEmoji(r.type)} ${typeLabel(r.type)}</div>
+      <div class="resource-name">${r.name}</div>
+      <div class="resource-location">📍 ${r.location || 'Ubicazione non specificata'}</div>
+      ${r.capacity ? `<div class="resource-capacity">👥 Fino a ${r.capacity} persone</div>` : ''}
+      ${amenities.length ? `<div class="amenities">${amenities.slice(0,4).map(a => `<span class="amenity">${a}</span>`).join('')}${amenities.length > 4 ? `<span class="amenity">+${amenities.length - 4}</span>` : ''}</div>` : ''}
+      <div class="resource-footer">
+        <span><span class="availability-dot ${busy ? 'busy' : ''}"></span><span class="availability-text">${busy ? 'Occupata ora' : 'Disponibile'}</span></span>
+        <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();quickBook('${r.id}')">Prenota</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setTypeFilter(type, el) {
+  currentTypeFilter = type;
+  document.querySelectorAll('#view-resources .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderResources();
+}
+function filterResources() { renderResources(); }
+
+function openResourceDetail(id) {
+  const r = allResources.find(x => x.id === id);
+  if (!r) return;
+  const amenities = Array.isArray(r.amenities) ? r.amenities : (typeof r.amenities === 'string' ? JSON.parse(r.amenities || '[]') : []);
+  $('detail-resource-name').textContent = r.name;
+  $('detail-resource-body').innerHTML = `
+    <div class="resource-type-badge type-${r.type}" style="margin-bottom:16px">${typeEmoji(r.type)} ${typeLabel(r.type)}</div>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px">${r.description || 'Nessuna descrizione'}</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--surface-2);padding:12px;border-radius:8px">
+        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Ubicazione</div>
+        <div style="font-size:15px;font-weight:500;margin-top:4px">📍 ${r.location || '—'}</div>
+      </div>
+      ${r.capacity ? `<div style="background:var(--surface-2);padding:12px;border-radius:8px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">Capienza</div><div style="font-size:15px;font-weight:500;margin-top:4px">👥 ${r.capacity} persone</div></div>` : ''}
+    </div>
+    ${amenities.length ? `<div><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:8px">Dotazioni</div><div class="amenities">${amenities.map(a => `<span class="amenity">✓ ${a}</span>`).join('')}</div></div>` : ''}
+  `;
+  $('detail-book-btn').onclick = () => { closeModal('modal-resource-detail'); quickBook(id); };
+  openModal('modal-resource-detail');
+}
+function quickBook(resourceId) { openNewBookingModal(resourceId); }
+
+// ── BOOKINGS ──
+async function loadDashboard() {
+  try {
+    const [bookings, resources] = await Promise.all([
+      apiFetch('/bookings?upcoming=true&my=true'),
+      apiFetch('/resources'),
+    ]);
+    const today = new Date().toDateString();
+    $('stat-today').textContent = bookings.filter(b => new Date(b.start_time).toDateString() === today).length;
+    $('stat-upcoming').textContent = bookings.length;
+    $('stat-rooms').textContent = resources.filter(r => r.type === 'meeting_room').length;
+    $('stat-equipment').textContent = resources.filter(r => r.type === 'equipment').length;
+
+    const upcoming5 = bookings.slice(0, 5);
+    $('dashboard-bookings').innerHTML = upcoming5.length
+      ? upcoming5.map(b => bookingCard(b)).join('')
+      : `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Nessuna prenotazione futura</div><div class="empty-sub">Prenota una sala o risorsa</div></div>`;
+  } catch (e) { console.error(e); }
+}
+
+async function loadMyBookings() {
+  const list = $('my-bookings-list');
+  list.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+  try {
+    const params = currentBookingFilter === 'upcoming' ? '?upcoming=true&my=true' : '?my=true';
+    const bookings = await apiFetch(`/bookings${params}`);
+    list.innerHTML = bookings.length
+      ? bookings.map(b => bookingCard(b, true)).join('')
+      : `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Nessuna prenotazione</div><div class="empty-sub">Le tue prenotazioni appariranno qui</div></div>`;
+  } catch { list.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">Errore caricamento</div></div>`; }
+}
+
+function bookingCard(b, showActions = false) {
+  const start = new Date(b.start_time);
+  const end = new Date(b.end_time);
+  const isPast = end < new Date();
+  const isRecurring = b.recurrence_id;
+  return `
+  <div class="booking-item">
+    <div class="booking-time-block">
+      <div class="booking-time-day">${start.toLocaleDateString('it-IT', { weekday: 'short' })}</div>
+      <div class="booking-time-num">${start.getDate()}</div>
+      <div class="booking-time-month">${start.toLocaleDateString('it-IT', { month: 'short' })}</div>
+    </div>
+    <div class="booking-divider"></div>
+    <div class="booking-info">
+      <div class="booking-title">
+        ${b.title}
+        ${isRecurring ? '<span class="recurring-badge">↻ Ricorrente</span>' : ''}
+      </div>
+      <div class="booking-meta">
+        <span>${typeEmoji(b.resource_type)} ${b.resource_name}</span>
+        <span>🕐 ${formatTime(b.start_time)} – ${formatTime(b.end_time)}</span>
+        ${b.resource_location ? `<span>📍 ${b.resource_location}</span>` : ''}
+      </div>
+    </div>
+    <div class="booking-actions">
+      <span class="status-badge ${isPast ? 'status-past' : 'status-confirmed'}">${isPast ? 'Terminata' : 'Confermata'}</span>
+      ${showActions && !isPast ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking('${b.id}')">✕</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function setBookingFilter(filter, el) {
+  currentBookingFilter = filter;
+  document.querySelectorAll('#view-bookings .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  loadMyBookings();
+}
+
+async function cancelBooking(id) {
+  if (!confirm('Sei sicuro di voler cancellare questa prenotazione?')) return;
+  try {
+    await apiFetch(`/bookings/${id}`, { method: 'DELETE' });
+    toast('Prenotazione cancellata');
+    loadMyBookings();
+    loadDashboard();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── NEW BOOKING MODAL ──
+function openNewBookingModal(resourceId = null) {
+  if (resourceId) { $('booking-resource-id').value = resourceId; updateResourceLabel(); }
+  $('booking-form-error').style.display = 'none';
+  // Reset recurring
+  $('booking-recurring').checked = false;
+  $('recurring-options').style.display = 'none';
+  openModal('modal-booking');
+}
+
+function updateResourceLabel() {
+  const sel = $('booking-resource-id');
+  const opt = sel.options[sel.selectedIndex];
+  $('modal-resource-name').textContent = opt.value ? opt.textContent : '';
+}
+
+function toggleRecurring() {
+  $('recurring-options').style.display = $('booking-recurring').checked ? 'block' : 'none';
+}
+
+async function submitBooking() {
+  const btn = $('booking-submit-btn');
+  const errEl = $('booking-form-error');
+  errEl.style.display = 'none';
+
+  const resource_id = $('booking-resource-id').value;
+  const title = $('booking-title').value.trim();
+  const date = $('booking-date').value;
+  const start = $('booking-start').value;
+  const end = $('booking-end').value;
+
+  if (!resource_id || !title || !date || !start || !end) {
+    errEl.textContent = 'Compila tutti i campi obbligatori'; errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Prenotazione in corso...';
+  try {
+    const res = await apiFetch('/bookings', {
+      method: 'POST',
+      body: JSON.stringify({
+        resource_id, title,
+        notes: $('booking-notes').value,
+        start_time: `${date}T${start}:00`,
+        end_time: `${date}T${end}:00`,
+        recurring: $('booking-recurring').checked,
+        weeks: parseInt($('booking-weeks').value),
+      }),
+    });
+    const msg = res.created
+      ? `${res.created.length} prenotazione/i confermata/e! 🎉${res.skipped?.length ? ` (${res.skipped.length} saltata/e per conflitto)` : ''}`
+      : 'Prenotazione confermata! 🎉';
+    toast(msg);
+    closeModal('modal-booking');
+    loadDashboard();
+    if ($('view-bookings').classList.contains('active')) loadMyBookings();
+    if ($('view-calendar').classList.contains('active')) renderCalendar();
+    $('booking-title').value = '';
+    $('booking-notes').value = '';
+  } catch (e) {
+    errEl.textContent = e.message; errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Conferma prenotazione';
+  }
+}
+
+// ── CALENDAR ──
+let calendarBookings = [];
+
+async function renderCalendar() {
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  $('calendar-month-label').textContent = new Date(year, month, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+  const start = new Date(year, month, 1).toISOString().split('T')[0];
+  const end = new Date(year, month + 1, 0).toISOString().split('T')[0];
+  try {
+    calendarBookings = await apiFetch(`/bookings/calendar?start=${start}&end=${end}`);
+  } catch { calendarBookings = []; }
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+  const today = new Date();
+  const cells = $('calendar-cells');
+  cells.innerHTML = '';
+
+  const prevDays = new Date(year, month, 0).getDate();
+  for (let i = startOffset - 1; i >= 0; i--) cells.appendChild(createCell(prevDays - i, month - 1, year, true));
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
+    cells.appendChild(createCell(d, month, year, false, isToday));
+  }
+  const remaining = 42 - (startOffset + daysInMonth);
+  for (let d = 1; d <= remaining; d++) cells.appendChild(createCell(d, month + 1, year, true));
+}
+
+function createCell(day, month, year, otherMonth, isToday = false) {
+  const cell = document.createElement('div');
+  cell.className = `calendar-cell${otherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}`;
+  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const dayBookings = calendarBookings.filter(b => b.start_time.startsWith(dateStr));
+  cell.innerHTML = `<div class="cell-date">${day}</div>
+${dayBookings.slice(0, 3).map(b => `<div class="cell-event type-${b.resource_type}" title="${b.title}">${b.resource_name}</div>`).join('')}
+  ${dayBookings.length > 3 ? `<div style="font-size:10px;color:var(--text-muted);padding:0 4px">+${dayBookings.length - 3} altri</div>` : ''}`;
+  cell.onclick = () => {
+    if (!otherMonth) { $('booking-date').value = dateStr; openNewBookingModal(); }
+  };
+  return cell;
+}
+
+function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth() + dir); renderCalendar(); }
+function goToToday() { calendarDate = new Date(); renderCalendar(); }
+
+// ── ADMIN ──
+let adminBookingFilter = 'upcoming';
+
+function setAdminBookingFilter(filter, el) {
+  adminBookingFilter = filter;
+  document.querySelectorAll('#view-admin-bookings .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  loadAdminBookings();
+}
+
+async function loadAdminBookings() {
+  const el = $('admin-bookings-content');
+  el.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+  try {
+    let params = '';
+    if (adminBookingFilter === 'upcoming') params = '?upcoming=true';
+    else if (adminBookingFilter === 'past') params = '?past=true';
+    const bookings = await apiFetch(`/bookings${params}`);
+    if (!bookings.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Nessuna prenotazione</div></div>`;
+      return;
+    }
+    el.innerHTML = `<table>
+      <thead><tr><th>Utente</th><th>Risorsa</th><th>Titolo</th><th>Data</th><th>Orario</th><th>Stato</th><th></th></tr></thead>
+      <tbody>${bookings.map(b => {
+        const isPast = new Date(b.end_time) < new Date();
+        return `<tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${b.avatar_color};width:28px;height:28px;font-size:11px">${initials(b.user_name)}</div>${b.user_name}</div></td>
+          <td>${typeEmoji(b.resource_type)} ${b.resource_name}</td>
+          <td>${b.title}${b.recurrence_id ? ' <span class="recurring-badge">↻</span>' : ''}</td>
+          <td>${formatDate(b.start_time)}</td>
+          <td>${formatTime(b.start_time)} – ${formatTime(b.end_time)}</td>
+          <td><span class="status-badge ${isPast ? 'status-past' : 'status-confirmed'}">${isPast ? 'Terminata' : 'Confermata'}</span></td>
+          <td>${!isPast ? `<button class="btn btn-danger btn-sm" onclick="cancelBookingAdmin('${b.id}')">Cancella</button>` : ''}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>`;
+  } catch (e) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">${e.message}</div></div>`; }
+}
+
+async function cancelBookingAdmin(id) {
+  if (!confirm('Sei sicuro di voler cancellare questa prenotazione?')) return;
+  try {
+    await apiFetch(`/bookings/${id}`, { method: 'DELETE' });
+    toast('Prenotazione cancellata');
+    loadAdminBookings();
+    loadDashboard();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function loadAdminResources() {
+  const el = $('admin-resources-content');
+  el.innerHTML = `<table>
+    <thead><tr><th>Nome</th><th>Tipo</th><th>Ubicazione</th><th>Capienza</th><th>Stato</th><th></th></tr></thead>
+    <tbody>${allResources.map(r => `
+      <tr>
+        <td><strong>${r.name}</strong></td>
+        <td><span class="resource-type-badge type-${r.type}">${typeEmoji(r.type)} ${typeLabel(r.type)}</span></td>
+        <td>${r.location || '—'}</td>
+        <td>${r.capacity || '—'}</td>
+        <td><span class="status-badge ${r.is_active ? 'status-confirmed' : 'status-cancelled'}">${r.is_active ? 'Attiva' : 'Disattiva'}</span></td>
+        <td><button class="btn btn-danger btn-sm" onclick="toggleResource('${r.id}', ${!r.is_active})">${r.is_active ? 'Disattiva' : 'Riattiva'}</button></td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+async function toggleResource(id, activate) {
+  try {
+    await apiFetch(`/resources/${id}`, { method: 'PUT', body: JSON.stringify({ is_active: activate }) });
+    toast(activate ? 'Risorsa riattivata' : 'Risorsa disattivata');
+    await loadResources();
+    loadAdminResources();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function loadAdminUsers() {
+  const el = $('admin-users-content');
+  try {
+    const users = await apiFetch('/users');
+    el.innerHTML = `<table>
+      <thead><tr><th>Nome</th><th>Email</th><th>Dipartimento</th><th>Ruolo</th><th></th></tr></thead>
+      <tbody>${users.map(u => `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${u.avatar_color};width:28px;height:28px;font-size:11px">${initials(u.name)}</div>${u.name}</div></td>
+          <td style="color:var(--text-muted)">${u.email}</td>
+          <td>${u.department || '—'}</td>
+          <td><span class="status-badge ${u.role === 'admin' ? 'status-cancelled' : 'status-confirmed'}">${u.role === 'admin' ? '⚡ Admin' : '👤 Dipendente'}</span></td>
+          <td>${u.id !== currentUser.id ? `<button class="btn btn-ghost btn-sm" onclick="toggleRole('${u.id}', '${u.role === 'admin' ? 'employee' : 'admin'}')">${u.role === 'admin' ? 'Rimuovi admin' : 'Rendi admin'}</button>` : '<span style="color:var(--text-dim);font-size:12px">Tu</span>'}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch (e) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">${e.message}</div></div>`; }
+}
+
+async function toggleRole(id, newRole) {
+  try {
+    await apiFetch(`/users/${id}/role`, { method: 'PUT', body: JSON.stringify({ role: newRole }) });
+    toast('Ruolo aggiornato');
+    loadAdminUsers();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function loadAdminLogs() {
+  const el = $('admin-logs-content');
+  el.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+  try {
+    const filterAction = $('log-filter-action').value;
+    const logs = await apiFetch(`/logs?limit=200${filterAction ? `&action=${filterAction}` : ''}`);
+    if (!logs.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Nessuna attività registrata</div></div>`;
+      return;
+    }
+    const actionLabel = {
+      BOOKING_CREATED: { label: 'Prenotazione creata', color: 'var(--green)', bg: 'var(--green-dim)' },
+      BOOKING_CANCELLED: { label: 'Prenotazione cancellata', color: 'var(--red)', bg: 'var(--red-dim)' },
+      USER_ROLE_CHANGED: { label: 'Ruolo modificato', color: 'var(--amber)', bg: 'var(--amber-dim)' },
+    };
+    el.innerHTML = `<table>
+      <thead><tr><th>Data/Ora</th><th>Utente</th><th>Azione</th><th>Dettagli</th><th>IP</th></tr></thead>
+      <tbody>${logs.map(l => {
+        const a = actionLabel[l.action] || { label: l.action, color: 'var(--text-muted)', bg: 'var(--surface-3)' };
+        const date = new Date(l.created_at);
+        return `<tr>
+          <td style="color:var(--text-muted);font-size:13px;white-space:nowrap">${date.toLocaleDateString('it-IT')} ${date.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}</td>
+          <td><div style="font-weight:500">${l.user_name || '—'}</div><div style="font-size:12px;color:var(--text-muted)">${l.user_email || ''}</div></td>
+          <td><span style="background:${a.bg};color:${a.color};padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600">${a.label}</span></td>
+          <td style="font-size:13px;color:var(--text-muted)">${l.details || '—'}</td>
+          <td style="font-size:12px;color:var(--text-dim)">${l.ip_address || '—'}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>`;
+  } catch (e) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-title">${e.message}</div></div>`; }
+}
+
+async function submitAddResource() {
+  try {
+    const amenities = $('res-amenities').value.split(',').map(a => a.trim()).filter(Boolean);
+    await apiFetch('/resources', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: $('res-name').value,
+        type: $('res-type').value,
+        location: $('res-location').value,
+        capacity: $('res-capacity').value || null,
+        description: $('res-description').value,
+        amenities,
+      }),
+    });
+    toast('Risorsa aggiunta!');
+    closeModal('modal-add-resource');
+    await loadResources();
+    loadAdminResources();
+  } catch (e) { toast(e.message, 'error'); }
+}
+function openAddResourceModal() { openModal('modal-add-resource'); }
+
+// ── PROFILE ──
+function loadProfileView() {
+  $('profile-name').value = currentUser.name || '';
+  $('profile-email').value = currentUser.email || '';
+  $('profile-dept').value = currentUser.department || '';
+  $('profile-error').style.display = 'none';
+  $('profile-success').style.display = 'none';
+  $('password-error').style.display = 'none';
+  $('password-success').style.display = 'none';
+  $('profile-current-pw').value = '';
+  $('profile-new-pw').value = '';
+  $('profile-confirm-pw').value = '';
+  // Reset hints
+  ['profile-h1','profile-h2','profile-h3','profile-h4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('ok');
+  });
+}
+
+async function saveProfile() {
+  const errEl = $('profile-error');
+  const okEl = $('profile-success');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  const name = $('profile-name').value.trim();
+  const department = $('profile-dept').value;
+  if (!name) { errEl.textContent = 'Il nome è obbligatorio'; errEl.style.display = 'block'; return; }
+  try {
+    const updated = await apiFetch('/users/me', {
+      method: 'PUT',
+      body: JSON.stringify({ name, department }),
+    });
+    currentUser.name = updated.name;
+    currentUser.department = updated.department;
+    $('sidebar-name').textContent = updated.name;
+    $('sidebar-avatar').textContent = initials(updated.name);
+    updateSidebarRole();
+    okEl.textContent = 'Dati aggiornati con successo!';
+    okEl.style.display = 'block';
+  } catch (e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+}
+
+async function savePassword() {
+  const errEl = $('password-error');
+  const okEl = $('password-success');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  const currentPassword = $('profile-current-pw').value;
+  const newPassword = $('profile-new-pw').value;
+  const confirmPassword = $('profile-confirm-pw').value;
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    errEl.textContent = 'Compila tutti i campi'; errEl.style.display = 'block'; return;
+  }
+  if (newPassword !== confirmPassword) {
+    errEl.textContent = 'Le password non coincidono'; errEl.style.display = 'block'; return;
+  }
+  if (newPassword.length < 8) { errEl.textContent = 'La password deve essere di almeno 8 caratteri'; errEl.style.display = 'block'; return; }
+  if (!/[A-Z]/.test(newPassword)) { errEl.textContent = 'La password deve contenere almeno una lettera maiuscola'; errEl.style.display = 'block'; return; }
+  if (!/[0-9]/.test(newPassword)) { errEl.textContent = 'La password deve contenere almeno un numero'; errEl.style.display = 'block'; return; }
+  if (!/[^a-zA-Z0-9]/.test(newPassword)) { errEl.textContent = 'La password deve contenere almeno un simbolo'; errEl.style.display = 'block'; return; }
+  try {
+    await apiFetch('/users/me/password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    okEl.textContent = 'Password cambiata con successo!';
+    okEl.style.display = 'block';
+    $('profile-current-pw').value = '';
+    $('profile-new-pw').value = '';
+    $('profile-confirm-pw').value = '';
+    ['profile-h1','profile-h2','profile-h3','profile-h4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('ok');
+    });
+  } catch (e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+}
+
+// ── MODALS ──
+function openModal(id) { $(id).classList.add('open'); }
+function closeModal(id) { $(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+
+// ── FORGOT / RESET PASSWORD ──
+function showForgotPassword() {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  $('login-form').style.display = 'none';
+  $('register-form').style.display = 'none';
+  $('forgot-form').style.display = 'block';
+  $('auth-error').style.display = 'none';
+}
+
+async function handleForgotPassword() {
+  const btn = $('forgot-btn');
+  const errEl = $('auth-error');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Invio in corso...';
+  try {
+    await apiFetch('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email: $('forgot-email').value }),
+    });
+    errEl.style.background = 'var(--green-dim)';
+    errEl.style.color = 'var(--green)';
+    errEl.style.borderColor = 'rgba(52,211,153,0.3)';
+    errEl.textContent = 'Email inviata! Controlla la tua casella.';
+    errEl.style.display = 'block';
+  } catch(e) {
+    showAuthError(e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Invia link di reset';
+  }
+}
+
+async function handleResetPassword(resetToken) {
+  const password = $('reset-password').value;
+  const confirm = $('reset-password-confirm').value;
+  if (password !== confirm) { showAuthError('Le password non coincidono'); return; }
+  if (password.length < 8) { showAuthError('La password deve essere di almeno 8 caratteri'); return; }
+  if (!/[A-Z]/.test(password)) { showAuthError('La password deve contenere almeno una lettera maiuscola'); return; }
+  if (!/[0-9]/.test(password)) { showAuthError('La password deve contenere almeno un numero'); return; }
+  if (!/[^a-zA-Z0-9]/.test(password)) { showAuthError('La password deve contenere almeno un simbolo'); return; }
+  try {
+    await apiFetch('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token: resetToken, password }),
+    });
+    const errEl = $('auth-error');
+    errEl.style.background = 'var(--green-dim)';
+    errEl.style.color = 'var(--green)';
+    errEl.style.borderColor = 'rgba(52,211,153,0.3)';
+    errEl.textContent = 'Password aggiornata! Reindirizzamento...';
+    errEl.style.display = 'block';
+    setTimeout(() => window.location.href = '/', 2000);
+  } catch(e) { showAuthError(e.message); }
+}
+
+// ── BOOT ──
+const urlParams = new URLSearchParams(window.location.search);
+const resetToken = urlParams.get('reset');
+
+if (resetToken) {
+  document.addEventListener('DOMContentLoaded', () => {
+    $('auth-screen').style.display = 'flex';
+    $('login-form').style.display = 'none';
+    $('register-form').style.display = 'none';
+    $('forgot-form').style.display = 'none';
+    const authTabs = document.querySelector('.auth-tabs');
+    if (authTabs) authTabs.style.display = 'none';
+    const authTitle = $('auth-title');
+    if (authTitle) authTitle.textContent = 'Nuova password';
+    const authSub = document.querySelector('.auth-sub');
+    if (authSub) authSub.textContent = 'Inserisci la tua nuova password';
+    document.querySelector('.auth-card').insertAdjacentHTML('beforeend', `
+      <div id="reset-form">
+        <div class="field"><label>Nuova password</label><input type="password" id="reset-password" placeholder="Min 8 caratteri, 1 maiuscola, 1 numero, 1 simbolo"></div>
+        <div class="field"><label>Conferma password</label><input type="password" id="reset-password-confirm" placeholder="Ripeti la password"></div>
+        <button class="btn-primary" onclick="handleResetPassword('${resetToken}')">Salva nuova password</button>
+      </div>
+    `);
+  });
+} else if (token) {
+  initApp();
+} else {
+  $('auth-screen').style.display = 'flex';
+}
+
+const cancelId = urlParams.get('cancel');
+if (cancelId && token) {
+  initApp().then(async () => {
+    if (confirm('Vuoi cancellare questa prenotazione?')) {
+      try {
+        await apiFetch(`/bookings/${cancelId}`, { method: 'DELETE' });
+        alert('Prenotazione cancellata con successo!');
+      } catch(e) { alert('Errore: ' + e.message); }
+    }
+    window.location.href = '/';
+  });
+}
+</script>
+</body>
+</html>
