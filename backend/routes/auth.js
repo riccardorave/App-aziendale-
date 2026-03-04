@@ -49,17 +49,56 @@ router.post('/login', [
 
   const { email, password } = req.body;
   try {
+    // Controlla tentativi falliti nell'ultima ora
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const attempts = await db.query(
+      'SELECT COUNT(*) FROM login_attempts WHERE email=$1 AND attempted_at > $2',
+      [email, oneHourAgo]
+    );
+    const attemptCount = parseInt(attempts.rows[0].count);
+
+    if (attemptCount >= 4) {
+      const oldest = await db.query(
+        'SELECT attempted_at FROM login_attempts WHERE email=$1 AND attempted_at > $2 ORDER BY attempted_at ASC LIMIT 1',
+        [email, oneHourAgo]
+      );
+      const unlockTime = new Date(oldest.rows[0].attempted_at.getTime() + 60 * 60 * 1000);
+      const minutesLeft = Math.ceil((unlockTime - Date.now()) / 60000);
+      return res.status(429).json({ 
+        error: `Account bloccato per troppi tentativi. Riprova tra ${minutesLeft} minuti.` 
+      });
+    }
+
     const { rows } = await db.query(
       'SELECT id, name, email, password, role, department, avatar_color FROM users WHERE email=$1',
       [email]
     );
-    if (!rows.length) return res.status(401).json({ error: 'Credenziali non valide' });
+    if (!rows.length) {
+      await db.query('INSERT INTO login_attempts (email) VALUES ($1)', [email]);
+      return res.status(401).json({ error: 'Credenziali non valide' });
+    }
 
     const user = rows[0];
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: 'Credenziali non valide' });
+    
+    if (!valid) {
+      await db.query('INSERT INTO login_attempts (email) VALUES ($1)', [email]);
+      const remaining = 3 - attemptCount;
+      return res.status(401).json({ 
+        error: remaining > 0 
+          ? `Credenziali non valide. Ancora ${remaining} tentativ${remaining === 1 ? 'o' : 'i'} prima del blocco.`
+          : 'Credenziali non valide. Al prossimo tentativo l\'account verrà bloccato.'
+      });
+    }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Login riuscito — pulisci i tentativi falliti
+    await db.query('DELETE FROM login_attempts WHERE email=$1', [email]);
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
     const { password: _, ...safeUser } = user;
     res.json({ token, user: safeUser });
   } catch (err) {
