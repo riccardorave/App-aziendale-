@@ -14,7 +14,7 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>SmartBooking</string>
-	<key>CFBundlePackageType</key>
+	<key>CFBundlePackageType</key> 
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
